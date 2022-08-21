@@ -39,6 +39,6 @@ def asal_sayi_aday_uret(uzunluk):
 
 def asal_sayi_uret(uzunluk, haric = 1):
     p = 4
-    while not asal_kontrol(p, 128) and haric != p:
+    while not asal_kontrol(p, 128) or haric == p:
         p = asal_sayi_aday_uret(uzunluk)
     return p
