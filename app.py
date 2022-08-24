@@ -3,7 +3,7 @@ import os
 import sys
 import kivy
 from kivy.app import App
-from kivy.clock import Clock
+from kivy.clock import Clock, mainthread
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.core.window import Window
@@ -128,10 +128,7 @@ class ChatPage(BoxLayout):
         time.sleep(2)
         #dropdown menüden kişi bilgilerine erişim
         self.dropdown = DropDown()
-        for name in self.users_online:
-            btn = Button(text=f'{name}', size_hint_y=None, height = self.send.height)
-            btn.bind(on_release=lambda btn: self.dropdown.select(btn.text))
-            self.dropdown.add_widget(btn)
+        self.update_users()
         self.users_list_btn = Button(size_hint=(None, None))
         self.users_list_btn.bind(on_release=self.dropdown.open)
         self.dropdown.bind(on_select=lambda instance, x: setattr(self.users_list_btn, 'text', x))
@@ -184,11 +181,19 @@ class ChatPage(BoxLayout):
     
     def incoming_message(self, username, message):
         if username == '__flag__':
-            self.users_online = eval(message) 
+            self.users_online = eval(message)
+            self.update_users()
         else:
             self.history.update_chat_history(
                 f'[color=20dd20]{username}[/color] > {message}'
             )
+    @mainthread
+    def update_users(self):
+        self.dropdown.clear_widgets()
+        for name in self.users_online:
+            btn = Button(text=f'{name}', size_hint_y=None, height = self.send.height)
+            btn.bind(on_release=lambda btn: self.dropdown.select(btn.text))
+            self.dropdown.add_widget(btn)
 
 #Uygulamanın main fonksiyonu
 class RSAMesajlasma(App):
